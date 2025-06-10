@@ -1,13 +1,25 @@
 use dirs::cache_dir;
 use rusqlite::Connection;
 use rusqlite::Result;
+use serde::Deserialize;
 use serde_rusqlite::{columns_from_statement, from_row_with_columns};
 use std::collections::HashMap;
 use std::fs;
+use std::fs::read_to_string;
 use std::path::PathBuf;
 
 const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
 const DB_NAME: &str = "sport_rental.sqlite";
+
+#[derive(Deserialize)]
+struct DbSchema {
+    schema: SchemaSection,
+}
+
+#[derive(Deserialize)]
+struct SchemaSection {
+    init: String,
+}
 
 fn verbose_println(verbose: bool, msg: &str) {
     if verbose {
@@ -25,50 +37,32 @@ fn get_db_path(verbose: bool) -> PathBuf {
     path
 }
 
+fn load_schema() -> String {
+    let content = read_to_string("db.toml").expect("Failed to read db.toml");
+    let parsed: DbSchema = toml::from_str(&content).expect("Failed to parse db.toml");
+    parsed.schema.init
+}
+
 pub fn setup_db(verbose: bool) -> Result<()> {
     let path = get_db_path(verbose);
     verbose_println(verbose, &format!("Checking if DB exists at {:?}", path));
     if path.exists() {
         verbose_println(verbose, "DB already exists. Skipping creation.");
-        return Ok(()); // Already initialized
+        return Ok(());
     }
 
     verbose_println(verbose, "DB does not exist, creating new database...");
-
-    let conn = Connection::open(get_db_path(verbose))?;
+    let conn = Connection::open(&path)?;
     verbose_println(verbose, "Database connection opened.");
 
-    conn.execute_batch(
-        "
-        CREATE TABLE Client (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            age INTEGER NOT NULL
-        );
-        CREATE TABLE Equipment (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            category TEXT,
-            available BOOLEAN NOT NULL DEFAULT 1
-        );
-        CREATE TABLE Rental (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            client_id INTEGER NOT NULL,
-            equipment_id INTEGER NOT NULL,
-            start_date TEXT NOT NULL,
-            end_date TEXT,
-            FOREIGN KEY(client_id) REFERENCES Client(id),
-            FOREIGN KEY(equipment_id) REFERENCES Equipment(id)
-        );
-        ",
-    )?;
-    verbose_println(verbose, "Tables created successfully.");
+    let schema_sql = load_schema();
+    conn.execute_batch(&schema_sql)?;
+    verbose_println(verbose, "Tables created successfully from TOML schema.");
 
     Ok(())
 }
 
-pub fn _reset_db(verbose: bool) -> Result<()> {
+pub fn reset_db(verbose: bool) -> Result<()> {
     let path = get_db_path(verbose);
     verbose_println(verbose, &format!("Resetting DB at {:?}", path));
     if path.exists() {

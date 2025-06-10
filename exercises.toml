@@ -6,4 +6,44 @@ solution = "SELECT name FROM Client;"
 [[exercises]]
 title = "Exercise 2"
 description = "Get the name of the oldest client."
-solution = "SELECT name FROM Client WHERE age = ALL (SELECT max(age) FROM Client);"
+solution = "SELECT name FROM Client WHERE age = (SELECT MAX(age) FROM Client);"
+
+[[exercises]]
+title = "Exercise 3"
+description = "List all equipment names along with their category names."
+solution = "SELECT Equipment.name, Category.name FROM Equipment LEFT JOIN Category ON Equipment.category_id = Category.id;"
+
+[[exercises]]
+title = "Exercise 4"
+description = "Find all clients who currently have at least one ongoing rental."
+solution = "SELECT DISTINCT Client.name FROM Client JOIN Rental ON Client.id = Rental.client_id WHERE Rental.status = 'ongoing';"
+
+[[exercises]]
+title = "Exercise 5"
+description = "Calculate the total amount paid by each client."
+solution = "SELECT Client.name, SUM(Payment.amount) AS total_paid FROM Client JOIN Rental ON Client.id = Rental.client_id JOIN Payment ON Rental.id = Payment.rental_id GROUP BY Client.id;"
+
+[[exercises]]
+title = "Exercise 6"
+description = "Find equipment that has never been rented."
+solution = "SELECT Equipment.name FROM Equipment LEFT JOIN Rental ON Equipment.id = Rental.equipment_id WHERE Rental.id IS NULL;"
+
+[[exercises]]
+title = "Exercise 7"
+description = "Get the average rental duration (in days) for all completed rentals."
+solution = "SELECT AVG(julianday(end_date) - julianday(start_date)) AS avg_duration FROM Rental WHERE end_date IS NOT NULL;"
+
+[[exercises]]
+title = "Exercise 8"
+description = "List clients who have rented equipment from more than 2 different categories."
+solution = "SELECT Client.name FROM Client JOIN Rental ON Client.id = Rental.client_id JOIN Equipment ON Rental.equipment_id = Equipment.id GROUP BY Client.id HAVING COUNT(DISTINCT Equipment.category_id) > 2;"
+
+[[exercises]]
+title = "Exercise 9"
+description = "Find the top 3 most rented equipment items by number of rentals."
+solution = "SELECT Equipment.name, COUNT(Rental.id) AS rental_count FROM Equipment JOIN Rental ON Equipment.id = Rental.equipment_id GROUP BY Equipment.id ORDER BY rental_count DESC LIMIT 3;"
+
+[[exercises]]
+title = "Exercise 10"
+description = "For each client, show their name, the number of rentals, and the total amount they have paid."
+solution = "SELECT Client.name, COUNT(Rental.id) AS rental_count, COALESCE(SUM(Payment.amount), 0) AS total_paid FROM Client LEFT JOIN Rental ON Client.id = Rental.client_id LEFT JOIN Payment ON Rental.id = Payment.rental_id GROUP BY Client.id;"

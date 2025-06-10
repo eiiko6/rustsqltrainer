@@ -1,0 +1,53 @@
+[schema]
+init = """
+CREATE TABLE Client (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    age INTEGER NOT NULL
+);
+
+CREATE TABLE Address (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id INTEGER NOT NULL,
+    street TEXT NOT NULL,
+    city TEXT NOT NULL,
+    postal_code TEXT NOT NULL,
+    country TEXT NOT NULL,
+    FOREIGN KEY(client_id) REFERENCES Client(id)
+);
+
+CREATE TABLE Category (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE Equipment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    category_id INTEGER,
+    available BOOLEAN NOT NULL DEFAULT 1,
+    price_per_day REAL NOT NULL DEFAULT 0,
+    FOREIGN KEY(category_id) REFERENCES Category(id)
+);
+
+CREATE TABLE Rental (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id INTEGER NOT NULL,
+    equipment_id INTEGER NOT NULL,
+    start_date TEXT NOT NULL,
+    end_date TEXT,
+    status TEXT NOT NULL DEFAULT 'ongoing',
+    FOREIGN KEY(client_id) REFERENCES Client(id),
+    FOREIGN KEY(equipment_id) REFERENCES Equipment(id)
+);
+
+CREATE TABLE Payment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rental_id INTEGER NOT NULL,
+    amount REAL NOT NULL,
+    payment_date TEXT NOT NULL,
+    method TEXT NOT NULL,
+    FOREIGN KEY(rental_id) REFERENCES Rental(id)
+);
+"""

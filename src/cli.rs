@@ -25,6 +25,9 @@ pub enum Action {
 
     /// Just initialize the db (not required with the other commands)
     Init,
+
+    /// Reset the database, effectively deleting it
+    Reset,
 }
 
 #[derive(Args, Debug)]

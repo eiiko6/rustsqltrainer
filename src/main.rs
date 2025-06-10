@@ -77,6 +77,22 @@ fn main() {
                 eprintln!("Exercise with id {} not found.", ex_args.id);
             }
         }
+        cli::Action::Query(query_args) => {
+            let result = match execute_query(&query_args.query, args.verbose) {
+                Ok(res) => res,
+                Err(e) => {
+                    eprintln!("Failed to execute your query: {e}");
+                    return;
+                }
+            };
+
+            for (i, row) in result.iter().enumerate() {
+                println!("Row {}:", i);
+                for (col, val) in row.iter() {
+                    println!("  {}: {}", col, val);
+                }
+            }
+        }
         cli::Action::Init => {
             if let Err(e) = setup_db(args.verbose) {
                 eprintln!("Failed to initialize database: {e}");

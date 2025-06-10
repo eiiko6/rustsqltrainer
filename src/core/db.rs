@@ -12,13 +12,19 @@ const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
 const DB_NAME: &str = "sport_rental.sqlite";
 
 #[derive(Deserialize)]
-struct DbSchema {
+struct Db {
     schema: SchemaSection,
+    inserts: InsertsSection,
 }
 
 #[derive(Deserialize)]
 struct SchemaSection {
-    init: String,
+    data: String,
+}
+
+#[derive(Deserialize)]
+struct InsertsSection {
+    data: String,
 }
 
 fn verbose_println(verbose: bool, msg: &str) {
@@ -37,10 +43,10 @@ fn get_db_path(verbose: bool) -> PathBuf {
     path
 }
 
-fn load_schema() -> String {
+fn load_schema() -> (String, String) {
     let content = read_to_string("db.toml").expect("Failed to read db.toml");
-    let parsed: DbSchema = toml::from_str(&content).expect("Failed to parse db.toml");
-    parsed.schema.init
+    let parsed: Db = toml::from_str(&content).expect("Failed to parse db.toml");
+    (parsed.schema.data, parsed.inserts.data)
 }
 
 pub fn setup_db(verbose: bool) -> Result<()> {
@@ -55,9 +61,12 @@ pub fn setup_db(verbose: bool) -> Result<()> {
     let conn = Connection::open(&path)?;
     verbose_println(verbose, "Database connection opened.");
 
-    let schema_sql = load_schema();
-    conn.execute_batch(&schema_sql)?;
+    let (schema, inserts) = load_schema();
+
+    conn.execute_batch(&schema)?;
     verbose_println(verbose, "Tables created successfully from TOML schema.");
+
+    conn.execute_batch(&inserts)?;
 
     Ok(())
 }
@@ -77,7 +86,11 @@ pub fn reset_db(verbose: bool) -> Result<()> {
 /// Executes a raw SQL query and returns results as a Vec of HashMaps
 pub fn execute_query(query: &str, verbose: bool) -> Result<Vec<HashMap<String, String>>> {
     verbose_println(verbose, &format!("Executing query: {}", query));
-    let conn = Connection::open(get_db_path(verbose))?;
+
+    let conn = Connection::open_with_flags(
+        get_db_path(verbose),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )?;
     verbose_println(verbose, "Database connection opened for query.");
 
     let mut stmt = conn.prepare(query)?;

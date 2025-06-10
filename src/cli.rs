@@ -23,6 +23,9 @@ pub enum Action {
     /// Do a specific exercise
     Exercise(ExerciseArgs),
 
+    /// Execute a query, nothing else
+    Query(QueryArgs),
+
     /// Just initialize the db (not required with the other commands)
     Init,
 
@@ -33,4 +36,9 @@ pub enum Action {
 #[derive(Args, Debug)]
 pub struct ExerciseArgs {
     pub id: i32,
+}
+
+#[derive(Args, Debug)]
+pub struct QueryArgs {
+    pub query: String,
 }

@@ -1,5 +1,5 @@
 [schema]
-init = """
+data = """
 CREATE TABLE Client (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -50,4 +50,56 @@ CREATE TABLE Payment (
     method TEXT NOT NULL,
     FOREIGN KEY(rental_id) REFERENCES Rental(id)
 );
+"""
+
+[inserts]
+data = """
+-- Clients
+INSERT INTO Client (name, email, age) VALUES 
+('Alice Dupont', 'alice.dupont@example.com', 29),
+('Bob Martin', 'bob.martin@example.com', 42),
+('Chloé Bernard', 'chloe.bernard@example.com', 35),
+('David Leroy', 'david.leroy@example.com', 50),
+('Emma Fontaine', 'emma.fontaine@example.com', 22);
+
+-- Addresses
+INSERT INTO Address (client_id, street, city, postal_code, country) VALUES
+(1, '12 Rue de la Paix', 'Paris', '75002', 'France'),
+(2, '5 Avenue Victor Hugo', 'Lyon', '69006', 'France'),
+(3, '3 Boulevard Haussmann', 'Marseille', '13008', 'France'),
+(4, '8 Rue des Lilas', 'Bordeaux', '33000', 'France'),
+(5, '1 Place Bellecour', 'Lyon', '69002', 'France');
+
+-- Categories
+INSERT INTO Category (name) VALUES 
+('Camping'),
+('Photography'),
+('Audio'),
+('Sport');
+
+-- Equipment
+INSERT INTO Equipment (name, category_id, available, price_per_day) VALUES
+('Tent 4-Person', 1, 1, 12.5),
+('DSLR Camera', 2, 1, 35.0),
+('Bluetooth Speaker', 3, 1, 15.0),
+('Mountain Bike', 4, 1, 20.0),
+('Sleeping Bag', 1, 1, 8.0),
+('Tripod', 2, 1, 5.0);
+
+-- Rentals
+INSERT INTO Rental (client_id, equipment_id, start_date, end_date, status) VALUES
+(1, 1, '2025-05-01', '2025-05-05', 'completed'),
+(2, 2, '2025-06-01', NULL, 'ongoing'),
+(1, 4, '2025-04-10', '2025-04-13', 'completed'),
+(3, 3, '2025-06-05', NULL, 'ongoing'),
+(4, 5, '2025-05-15', '2025-05-18', 'completed'),
+(1, 2, '2025-06-02', NULL, 'ongoing'),
+(5, 6, '2025-05-20', '2025-05-25', 'completed');
+
+-- Payments
+INSERT INTO Payment (rental_id, amount, payment_date, method) VALUES
+(1, 50.0, '2025-05-01', 'credit_card'),
+(3, 60.0, '2025-04-10', 'paypal'),
+(5, 24.0, '2025-05-15', 'credit_card'),
+(7, 25.0, '2025-05-20', 'bank_transfer');
 """

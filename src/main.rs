@@ -1,9 +1,44 @@
+use colored::Colorize;
 use core::{execute_query, get_db_path, reset_db, setup_db};
 use rustyline::DefaultEditor;
 
 use clap::Parser;
 mod cli;
 mod core;
+
+fn display_results(results: (Vec<String>, Vec<Vec<String>>)) {
+    let headers = &results.0;
+    let rows = &results.1;
+
+    let cols = headers.len();
+    let mut max_widths = vec![0; cols];
+
+    for (i, header) in headers.iter().enumerate() {
+        max_widths[i] = header.len();
+    }
+
+    for row in rows {
+        for (i, val) in row.iter().enumerate() {
+            if val.len() > max_widths[i] {
+                max_widths[i] = val.len();
+            }
+        }
+    }
+
+    // Print header with padding
+    for (i, header) in headers.iter().enumerate() {
+        print!("{:<width$} ", header.blue(), width = max_widths[i]);
+    }
+    println!();
+
+    // Print rows with padding and blue color
+    for row in rows {
+        for (i, val) in row.iter().enumerate() {
+            print!("{:<width$} ", val, width = max_widths[i]);
+        }
+        println!();
+    }
+}
 
 fn main() {
     let args = cli::Cli::parse();
@@ -13,20 +48,20 @@ fn main() {
 
     match args.action {
         cli::Action::Status => {
-            println!("Not yet implemented.");
+            println!("{}", "Not yet implemented.".yellow());
         }
         cli::Action::Continue => {
-            println!("Not yet implemented.");
+            println!("{}", "Not yet implemented.".yellow());
         }
         cli::Action::Exercise(ex_args) => {
             let exercises = core::load_exercises("./exercises.toml");
             if let Some(ex) = exercises.get(&ex_args.id) {
-                println!("Title: {}", ex.title);
+                println!("Title: {}", ex.title.bold().green());
                 println!("Description: {}", ex.description);
 
                 // Setup DB
                 if let Err(e) = setup_db(args.verbose) {
-                    eprintln!("Failed to initialize database: {e}");
+                    eprintln!("{}", format!("Failed to initialize database: {e}").red());
                     return;
                 }
 
@@ -34,7 +69,7 @@ fn main() {
                 let expected = match execute_query(&ex.solution, args.verbose) {
                     Ok(res) => res,
                     Err(e) => {
-                        eprintln!("Failed to execute solution query: {e}");
+                        eprintln!("{}", format!("Failed to execute solution query: {e}").red());
                         return;
                     }
                 };
@@ -54,76 +89,71 @@ fn main() {
                         trimmed
                     }
                     Err(e) => {
-                        eprintln!("Failed to read input: {e}");
+                        eprintln!("{}", format!("Failed to read input: {e}").red());
                         return;
                     }
                 };
 
                 // Save history back to file after the input
                 if let Err(e) = rl.save_history(&history_path) {
-                    eprintln!("Failed to save history: {e}");
+                    eprintln!("{}", format!("Failed to save history: {e}").yellow());
                 }
 
                 // Execute player's query
                 let player_result = match execute_query(&input_query, args.verbose) {
                     Ok(res) => res,
                     Err(e) => {
-                        eprintln!("Failed to execute your query: {e}");
+                        eprintln!("{}", format!("Failed to execute your query: {e}").red());
                         return;
                     }
                 };
 
                 // Compare player's result with expected result
                 if player_result == expected {
-                    println!("Correct!");
+                    println!("{}", "Correct!".bold().green());
                 } else {
-                    println!("Incorrect. Your query result did not match the expected output.");
-                    println!("Expected:");
-                    for (i, row) in expected.iter().enumerate() {
-                        println!("Row {}:", i);
-                        for (col, val) in row.iter() {
-                            println!("  {}: {}", col, val);
-                        }
-                    }
-                    println!("Got:");
-                    for (i, row) in player_result.iter().enumerate() {
-                        println!("Row {}:", i);
-                        for (col, val) in row.iter() {
-                            println!("  {}: {}", col, val);
-                        }
-                    }
+                    println!(
+                        "{}",
+                        "Incorrect. Your query result did not match the expected output."
+                            .bold()
+                            .red()
+                    );
+
+                    println!("{}", "Expected:".underline().yellow());
+                    display_results(expected);
+
+                    println!("{}", "Got:".underline().yellow());
+                    display_results(player_result);
                 }
             } else {
-                eprintln!("Exercise with id {} not found.", ex_args.id);
+                eprintln!(
+                    "{}",
+                    format!("Exercise with id {} not found.", ex_args.id).red()
+                );
             }
         }
         cli::Action::Query(query_args) => {
             let result = match execute_query(&query_args.query, args.verbose) {
                 Ok(res) => res,
                 Err(e) => {
-                    eprintln!("Failed to execute your query: {e}");
+                    eprintln!("{}", format!("Failed to execute your query: {e}").red());
                     return;
                 }
             };
 
-            for (i, row) in result.iter().enumerate() {
-                println!("Row {}:", i);
-                for (col, val) in row.iter() {
-                    println!("  {}: {}", col, val);
-                }
-            }
+            display_results(result);
         }
         cli::Action::Init => {
             if let Err(e) = setup_db(args.verbose) {
-                eprintln!("Failed to initialize database: {e}");
+                eprintln!("{}", format!("Failed to initialize database: {e}").red());
                 return;
             }
 
-            println!("Initialized database.");
+            println!("{}", "Initialized database.".bold().green());
         }
         cli::Action::Reset => {
             if let Err(e) = reset_db(args.verbose) {
-                eprintln!("Failed to reset database: {e}");
+                eprintln!("{}", format!("Failed to reset database: {e}").red());
             }
         }
     }

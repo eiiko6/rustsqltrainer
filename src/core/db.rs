@@ -1,9 +1,9 @@
+use colored::Colorize;
 use dirs::cache_dir;
 use rusqlite::Connection;
 use rusqlite::Result;
 use serde::Deserialize;
-use serde_rusqlite::{columns_from_statement, from_row_with_columns};
-use std::collections::HashMap;
+use serde_rusqlite::columns_from_statement;
 use std::fs;
 use std::fs::read_to_string;
 use std::path::PathBuf;
@@ -29,7 +29,7 @@ struct InsertsSection {
 
 fn verbose_println(verbose: bool, msg: &str) {
     if verbose {
-        println!("{}", msg);
+        println!("{}", msg.dimmed());
     }
 }
 
@@ -83,8 +83,19 @@ pub fn reset_db(verbose: bool) -> Result<()> {
     Ok(())
 }
 
+fn value_to_string(value: &rusqlite::types::Value) -> String {
+    use rusqlite::types::Value::*;
+    match value {
+        Null => "".to_string(),
+        Integer(i) => i.to_string(),
+        Real(f) => f.to_string(),
+        Text(t) => t.to_string(),
+        Blob(b) => format!("{:?}", b), // fallback for blobs
+    }
+}
+
 /// Executes a raw SQL query and returns results as a Vec of HashMaps
-pub fn execute_query(query: &str, verbose: bool) -> Result<Vec<HashMap<String, String>>> {
+pub fn execute_query(query: &str, verbose: bool) -> Result<(Vec<String>, Vec<Vec<String>>)> {
     verbose_println(verbose, &format!("Executing query: {}", query));
 
     let conn = Connection::open_with_flags(
@@ -93,15 +104,20 @@ pub fn execute_query(query: &str, verbose: bool) -> Result<Vec<HashMap<String, S
     )?;
     verbose_println(verbose, "Database connection opened for query.");
 
-    let mut stmt = conn.prepare(&query.replace("select", "SELECT"))?; // Avoid the "non-read-only" error
+    let mut stmt = conn.prepare(query)?;
     verbose_println(verbose, "Query prepared.");
 
     let columns = columns_from_statement(&stmt);
     verbose_println(verbose, &format!("Columns extracted: {:?}", columns));
 
     let rows = stmt.query_map([], |row| {
-        from_row_with_columns::<HashMap<String, String>>(row, &columns)
-            .map_err(|_| rusqlite::Error::InvalidQuery)
+        let mut vals = Vec::with_capacity(columns.len());
+        for idx in 0..columns.len() {
+            let val: Result<rusqlite::types::Value, _> = row.get(idx);
+            let val_str = val.as_ref().map_or("".to_string(), value_to_string);
+            vals.push(val_str);
+        }
+        Ok(vals)
     })?;
 
     let result = rows.collect::<Result<Vec<_>, _>>()?;
@@ -113,5 +129,5 @@ pub fn execute_query(query: &str, verbose: bool) -> Result<Vec<HashMap<String, S
         ),
     );
 
-    Ok(result)
+    Ok((columns, result))
 }

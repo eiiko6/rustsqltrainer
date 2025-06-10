@@ -26,4 +26,3 @@ pub fn load_exercises<P: AsRef<Path>>(path: P) -> HashMap<i32, Exercise> {
         .map(|(i, ex)| (i as i32 + 1, ex))
         .collect()
 }
-

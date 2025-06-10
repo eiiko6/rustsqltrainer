@@ -1,0 +1,9 @@
+[[exercises]]
+title = "Exercise 1"
+description = "Get the names of all clients."
+solution = "SELECT name FROM Client;"
+
+[[exercises]]
+title = "Exercise 2"
+description = "Get the name of the oldest client."
+solution = "SELECT name FROM Client WHERE age = ALL (SELECT max(age) FROM Client);"

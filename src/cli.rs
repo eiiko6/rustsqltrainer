@@ -1,0 +1,30 @@
+use clap::{Args, Parser, Subcommand};
+
+/// A progam that provide exercises on SQL queries
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+pub struct Cli {
+    #[command(subcommand)]
+    pub action: Action,
+
+    /// Activate verbose mode
+    #[arg(short, long)]
+    pub verbose: bool,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum Action {
+    /// See where you are at
+    Status,
+
+    /// Continue where you were at
+    Continue,
+
+    /// Do a specific exercise
+    Exercise(ExerciseArgs),
+}
+
+#[derive(Args, Debug)]
+pub struct ExerciseArgs {
+    pub id: i32,
+}

@@ -33,7 +33,7 @@ fn verbose_println(verbose: bool, msg: &str) {
     }
 }
 
-fn get_db_path(verbose: bool) -> PathBuf {
+pub fn get_db_path(verbose: bool) -> PathBuf {
     let mut path = cache_dir().expect("Could not determine cache directory");
     verbose_println(verbose, &format!("Cache directory: {:?}", path));
     path.push(CRATE_NAME);
@@ -93,7 +93,7 @@ pub fn execute_query(query: &str, verbose: bool) -> Result<Vec<HashMap<String, S
     )?;
     verbose_println(verbose, "Database connection opened for query.");
 
-    let mut stmt = conn.prepare(query)?;
+    let mut stmt = conn.prepare(&query.replace("select", "SELECT"))?; // Avoid the "non-read-only" error
     verbose_println(verbose, "Query prepared.");
 
     let columns = columns_from_statement(&stmt);

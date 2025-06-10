@@ -1,4 +1,5 @@
-use core::{execute_query, reset_db, setup_db};
+use core::{execute_query, get_db_path, reset_db, setup_db};
+use rustyline::DefaultEditor;
 
 use clap::Parser;
 mod cli;
@@ -6,6 +7,9 @@ mod core;
 
 fn main() {
     let args = cli::Cli::parse();
+
+    let mut history_path = get_db_path(args.verbose);
+    history_path.set_file_name("history.txt");
 
     match args.action {
         cli::Action::Status => {
@@ -36,16 +40,32 @@ fn main() {
                 };
 
                 // Prompt player for input query
-                println!("Enter your SQL query:");
+                let mut rl = DefaultEditor::new().unwrap();
+                if rl.load_history(&history_path).is_err() {
+                    // No previous history file found, ignore error
+                }
 
-                let mut input_query = String::new();
-                std::io::stdin()
-                    .read_line(&mut input_query)
-                    .expect("Failed to read input");
-                let input_query = input_query.trim();
+                let input_query = match rl.readline("Enter your SQL query: ") {
+                    Ok(line) => {
+                        let trimmed = line.trim().to_string();
+                        if !trimmed.is_empty() {
+                            rl.add_history_entry(trimmed.as_str()).unwrap();
+                        }
+                        trimmed
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to read input: {e}");
+                        return;
+                    }
+                };
+
+                // Save history back to file after the input
+                if let Err(e) = rl.save_history(&history_path) {
+                    eprintln!("Failed to save history: {e}");
+                }
 
                 // Execute player's query
-                let player_result = match execute_query(input_query, args.verbose) {
+                let player_result = match execute_query(&input_query, args.verbose) {
                     Ok(res) => res,
                     Err(e) => {
                         eprintln!("Failed to execute your query: {e}");

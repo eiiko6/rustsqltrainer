@@ -8,6 +8,11 @@ A program that provides exercises on SQL queries.
 rsqlt [OPTIONS] <SUBCOMMAND>
 ```
 
+Note that this can only be used in the repository as it needs the toml files.
+The database is stored in your cache directory.
+
+This uses [rustyline](https://crates.io/crates/rustyline/), so it keeps a history of you previous requests that you can navigate just like in a shell.
+
 ## Options
 
 * `-v`, `--verbose`

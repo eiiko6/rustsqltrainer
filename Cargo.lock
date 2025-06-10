@@ -53,6 +53,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.98"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e16d2d3311acee920a9eb8d33b8cbc1787ce4a264e85f964c2404b969bdcd487"
+
+[[package]]
 name = "bitflags"
 version = "2.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -298,11 +304,13 @@ dependencies = [
 name = "rsqlt"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "clap",
  "colored",
  "dirs",
  "rusqlite",
  "serde",
+ "serde_rusqlite",
  "toml",
 ]
 
@@ -338,6 +346,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "serde_rusqlite"
+version = "0.39.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4edfce51dc48d6b4164d661bece122f1c5e6bf8bc56c305843911e76215f57c4"
+dependencies = [
+ "rusqlite",
+ "serde",
 ]
 
 [[package]]

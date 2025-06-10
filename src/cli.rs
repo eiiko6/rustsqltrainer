@@ -22,6 +22,9 @@ pub enum Action {
 
     /// Do a specific exercise
     Exercise(ExerciseArgs),
+
+    /// Just initialize the db (not required with the other commands)
+    Init,
 }
 
 #[derive(Args, Debug)]

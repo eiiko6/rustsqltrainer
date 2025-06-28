@@ -15,9 +15,13 @@ struct ExercisesFile {
     exercises: Vec<Exercise>,
 }
 
-pub fn load_exercises<P: AsRef<Path>>(path: P) -> HashMap<i32, Exercise> {
+pub fn load_exercises_from_file<P: AsRef<Path>>(path: P) -> HashMap<i32, Exercise> {
     let content = fs::read_to_string(path).expect("Failed to read the TOML file");
-    let exercises_file: ExercisesFile = toml::from_str(&content).expect("Failed to parse TOML");
+    load_exercises_from_str(&content)
+}
+
+pub fn load_exercises_from_str(content: &str) -> HashMap<i32, Exercise> {
+    let exercises_file: ExercisesFile = toml::from_str(content).expect("Failed to parse TOML");
 
     exercises_file
         .exercises

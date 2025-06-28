@@ -3,8 +3,9 @@ use core::{execute_query, get_db_path, reset_db, setup_db};
 use rustyline::DefaultEditor;
 
 use clap::Parser;
-mod cli;
-mod core;
+use rsqlt::EXERCISES_TOML;
+use rsqlt::cli;
+use rsqlt::core;
 
 fn display_results(results: (Vec<String>, Vec<Vec<String>>)) {
     let headers = &results.0;
@@ -54,7 +55,7 @@ fn main() {
             println!("{}", "Not yet implemented.".yellow());
         }
         cli::Action::Exercise(ex_args) => {
-            let exercises = core::load_exercises("./exercises.toml");
+            let exercises = core::load_exercises_from_str(EXERCISES_TOML);
             if let Some(ex) = exercises.get(&ex_args.id) {
                 println!("Title: {}", ex.title.bold().green());
                 println!("Description: {}", ex.description);

@@ -1,3 +1,4 @@
+use crate::DB_TOML;
 use colored::Colorize;
 use dirs::cache_dir;
 use rusqlite::Connection;
@@ -5,7 +6,6 @@ use rusqlite::Result;
 use serde::Deserialize;
 use serde_rusqlite::columns_from_statement;
 use std::fs;
-use std::fs::read_to_string;
 use std::path::PathBuf;
 
 const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
@@ -44,8 +44,8 @@ pub fn get_db_path(verbose: bool) -> PathBuf {
 }
 
 fn load_schema() -> (String, String) {
-    let content = read_to_string("db.toml").expect("Failed to read db.toml");
-    let parsed: Db = toml::from_str(&content).expect("Failed to parse db.toml");
+    let content = DB_TOML;
+    let parsed: Db = toml::from_str(content).expect("Failed to parse db.toml");
     (parsed.schema.data, parsed.inserts.data)
 }
 

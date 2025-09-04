@@ -1,77 +1,93 @@
 # Rust SQL Trainer (rsqlt)
 
-A program that provides exercises on SQL queries.  
-rsqlt is fully cross platform, and does not require any setup.
+**rsqlt** is a cross-platform program for learning and practicing SQL queries through interactive exercises.
 
-## Usage
+## Features
+
+* Interactive SQL exercises with instant feedback.
+* Improved exercise navigation via CLI or web.
+* Web frontend built with Vue.js, embedded into a single Rust binary for now.
+* Fully cross-platform: Linux, Windows, macOS.
+* Persistent SQL query history in CLI mode (powered by [rustyline](https://crates.io/crates/rustyline)).
+
+## Installation
+
+Just compile the Rust project, or download a prebuilt binary. No database setup required — the database is automatically stored in your system’s cache directory.
+
+## CLI Usage
 
 ```bash
 rsqlt [OPTIONS] <SUBCOMMAND>
 ```
 
-The database is stored in your cache directory.
+### Options
 
-This uses [rustyline](https://crates.io/crates/rustyline/), so it keeps a history of you previous requests that you can navigate just like in a shell.
+* `-v`, `--verbose` — Enable verbose mode.
 
-## Options
+### Subcommands
 
-* `-v`, `--verbose`
-  Activate verbose mode.
+#### `status` (planned)
 
-## Subcommands
-
-### status (not yet implemented)
-
-See where you are at.
+Check your current progress.
 
 ```bash
 rsqlt-cli status
 ```
 
-### continue (not yet implemented)
+#### `continue` (planned)
 
-Continue where you were at.
+Continue from your last unfinished exercise.
 
 ```bash
 rsqlt-cli continue
 ```
 
-### exercise
+#### `exercise`
 
-Do a specific exercise by its ID.
+Attempt a specific exercise by its ID.
 
 ```bash
 rsqlt-cli exercise <id>
 ```
 
-### query
+#### `query`
 
-Execute a raw SQL query directly, nothing else.
+Execute a raw SQL query directly, without exercises.
 
 ```bash
 rsqlt-cli query "<SQL_QUERY>"
 ```
 
-### init
+#### `init`
 
-Initialize the database (not required with other commands).
+Initialize the database (optional, other commands do this automatically).
 
 ```bash
 rsqlt-cli init
 ```
 
-### reset
+#### `reset`
 
-Reset the database, effectively deleting it.
+Reset the database, deleting all progress.
 
 ```bash
 rsqlt-cli reset
 ```
 
-### web server
+## Web Usage
 
-Launch the web server and open it in your browser.
+Launch the **embedded web server** and open the interactive Vue frontend in your browser (`locahost:3000`).  
+Works on any platform.
 
 ```bash
 rsqlt-web
 ```
+
+> ⚠️ **Note:** On the `rsqlt-web` binary, the web frontend communicates with the backend via local ports on your machine.
+> This is inelegant and is only meant as a shortcut to let users run the app easily without needing to configure a separate web server.
+> This means it is not a ready-to-use app, as this project is (eventually) intended to have its frontend and backend split.
+
+### Development Notes
+
+* Frontend is in `frontend/` and uses Vue.js + Vite.
+* For now static assets are embedded in the Rust binary via [rust-embed](https://crates.io/crates/rust-embed) to offer a convenient local web app.

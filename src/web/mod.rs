@@ -1,10 +1,10 @@
-use axum::{
-    Router,
-    routing::{get, post},
-};
+use axum::Router;
 use std::net::SocketAddr;
+use tower_http::services::ServeDir;
 
+pub mod api;
 pub mod handlers;
+
 use crate::core::setup_db;
 
 pub async fn start_server() {
@@ -14,19 +14,16 @@ pub async fn start_server() {
     }
 
     let app = Router::new()
-        .route("/", get(handlers::home))
-        .route("/exercise/{id}", get(handlers::exercise))
-        .route("/submit", post(handlers::submit));
+        // API routes
+        .nest("/api", api::routes())
+        // Serve built frontend (from frontend/dist)
+        .fallback_service(ServeDir::new("frontend/dist"));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    let url = format!("http://{}", addr);
-
-    if webbrowser::open(&url).is_ok() {
-        println!("Opened in your browser");
-    }
-    println!("Listening on http://{}", addr);
+    println!("Listening on http://{addr}");
 
     axum::serve(tokio::net::TcpListener::bind(addr).await.unwrap(), app)
         .await
         .unwrap();
 }
+

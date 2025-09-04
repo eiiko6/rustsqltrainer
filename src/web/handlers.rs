@@ -15,7 +15,7 @@ pub async fn home() -> Html<String> {
         .collect::<Vec<_>>()
         .join("\n");
 
-    Html(format!("<h1>Exercises</h1><ul>{}</ul>", list))
+    Html(format!("<h1>Exercises</h1><ul>{list}</ul>"))
 }
 
 pub async fn exercise(Path(id): Path<String>) -> Html<String> {

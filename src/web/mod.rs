@@ -2,6 +2,9 @@ use axum::Router;
 use std::net::SocketAddr;
 use tower_http::services::ServeDir;
 
+mod embed;
+use embed::app_router;
+
 pub mod api;
 pub mod handlers;
 
@@ -13,17 +16,14 @@ pub async fn start_server() {
         std::process::exit(1);
     }
 
-    let app = Router::new()
-        // API routes
-        .nest("/api", api::routes())
-        // Serve built frontend (from frontend/dist)
-        .fallback_service(ServeDir::new("frontend/dist"));
+    let app = app_router();
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    println!("Listening on http://{addr}");
+    println!("Listening on http://{}", addr);
 
-    axum::serve(tokio::net::TcpListener::bind(addr).await.unwrap(), app)
+    let listener = tokio::net::TcpListener::bind(addr)
         .await
-        .unwrap();
-}
+        .expect("failed to bind listener");
 
+    axum::serve(listener, app).await.expect("server error");
+}

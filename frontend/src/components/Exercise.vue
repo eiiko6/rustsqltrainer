@@ -1,15 +1,33 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const exercise = ref(null)
 const query = ref('')
 const result = ref(null)
+const exercises = ref([]) // We'll fetch all exercises to know next
+
+async function loadExercise(id) {
+  const res = await fetch(`/api/exercise/${id}`)
+  exercise.value = await res.json()
+  query.value = ''
+  result.value = null
+}
 
 onMounted(async () => {
-  const res = await fetch(`/api/exercise/${route.params.id}`)
-  exercise.value = await res.json()
+  // Fetch all exercises once
+  const exRes = await fetch('/api/exercises')
+  exercises.value = (await exRes.json()).sort((a, b) => a.id - b.id)
+
+  // Load current exercise
+  await loadExercise(route.params.id)
+})
+
+// Watch for route changes (when navigating to next exercise)
+watch(() => route.params.id, async (newId) => {
+  await loadExercise(newId)
 })
 
 async function submit() {
@@ -23,6 +41,17 @@ async function submit() {
     }),
   })
   result.value = await res.json()
+}
+
+function goNext() {
+  const currentIndex = exercises.value.findIndex(e => e.id == exercise.value.id)
+  const nextExercise = exercises.value[currentIndex + 1]
+
+  if (nextExercise) {
+    router.push(`/exercise/${nextExercise.id}`)
+  } else {
+    router.push('/') // back to home if last exercise
+  }
 }
 </script>
 
@@ -39,11 +68,41 @@ async function submit() {
       <p :style="{ color: result.correct ? 'green' : 'red' }">
         {{ result.message }}
       </p>
+      <button v-if="result.correct" @click="goNext">
+        Next Exercise
+      </button>
     </div>
   </div>
 
   <p v-else>Loading...</p>
 </template>
+
+<style>
+textarea {
+  width: 100%;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  font-family: monospace;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background: #007acc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #005fa3;
+}
+
+.result {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+</style>
 
 <style>
 textarea {

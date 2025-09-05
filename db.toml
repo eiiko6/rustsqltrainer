@@ -128,8 +128,7 @@ INSERT INTO Rental (client_id, equipment_id, start_date, end_date, status) VALUE
 (10, 12, '2025-08-01', NULL, 'ongoing'),
 (11, 13, '2025-05-25', '2025-05-28', 'completed'),
 (12, 14, '2025-06-20', NULL, 'ongoing'),
-(6, 15, '2025-07-05', '2025-07-08', 'completed'),
-(7, 16, '2025-07-10', '2025-07-14', 'completed');
+(6, 15, '2025-07-05', '2025-07-08', 'completed');
 
 -- Payments
 INSERT INTO Payment (rental_id, amount, payment_date, method) VALUES
@@ -143,5 +142,5 @@ INSERT INTO Payment (rental_id, amount, payment_date, method) VALUES
 (13, 180.0, '2025-02-12', 'credit_card'),
 (15, 66.0, '2025-05-25', 'paypal'),
 (16, 88.0, '2025-06-20', 'credit_card'),
-(18, 54.0, '2025-07-05', 'bank_transfer'),
+(17, 54.0, '2025-07-05', 'bank_transfer');
 """

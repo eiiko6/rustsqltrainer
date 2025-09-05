@@ -17,10 +17,6 @@ fn test_load_database() {
     let _ = reset_db(true);
     let db = setup_db(true);
 
-    if let Err(e) = &db {
-        eprintln!("Database creation failed: {:?}", e);
-    }
-
     assert!(db.is_ok());
 }
 

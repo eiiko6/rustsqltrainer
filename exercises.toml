@@ -15,8 +15,8 @@ solution = "SELECT Equipment.name, Category.name FROM Equipment LEFT JOIN Catego
 
 [[exercises]]
 title = "Exercise 4: JOIN with Condition"
-description = "Find all clients who currently have at least one ongoing rental."
-solution = "SELECT DISTINCT Client.name FROM Client JOIN Rental ON Client.id = Rental.client_id WHERE Rental.status = 'ongoing';"
+description = "Find all clients (id) who currently have at least one ongoing rental."
+solution = "SELECT DISTINCT Client.id FROM Client JOIN Rental ON Client.id = Rental.client_id WHERE Rental.status = 'ongoing';"
 
 [[exercises]]
 title = "Exercise 5: Aggregation with GROUP BY"
@@ -25,18 +25,18 @@ solution = "SELECT Client.name, SUM(Payment.amount) AS total_paid FROM Client JO
 
 [[exercises]]
 title = "Exercise 6: Other JOIN operators?"
-description = "Find equipment that has never been rented."
-solution = "SELECT Equipment.name FROM Equipment LEFT JOIN Rental ON Equipment.id = Rental.equipment_id WHERE Rental.id IS NULL;"
+description = "Find equipment (id) that has never been rented."
+solution = "SELECT Equipment.id FROM Equipment LEFT JOIN Rental ON Equipment.id = Rental.equipment_id WHERE Rental.id IS NULL;"
 
 [[exercises]]
 title = "Exercise 7: Date Functions"
 description = "Get the average rental duration (in days) for all completed rentals."
-solution = "SELECT AVG(julianday(end_date) - julianday(start_date)) AS avg_duration FROM Rental WHERE end_date IS NOT NULL;"
+solution = "SELECT AVG(julianday(end_date) - julianday(start_date)) AS avg_duration FROM Rental WHERE end_date IS NOT NULL AND status = 'completed';"
 
 [[exercises]]
 title = "Exercise 8: Grouped Filtering"
-description = "List clients who have rented equipment from more than 2 different categories."
-solution = "SELECT Client.name FROM Client JOIN Rental ON Client.id = Rental.client_id JOIN Equipment ON Rental.equipment_id = Equipment.id GROUP BY Client.id HAVING COUNT(DISTINCT Equipment.category_id) > 2;"
+description = "List clients (id) who have rented equipment from more than 2 different categories."
+solution = "SELECT Client.id FROM Client JOIN Rental ON Client.id = Rental.client_id JOIN Equipment ON Rental.equipment_id = Equipment.id GROUP BY Client.id HAVING COUNT(DISTINCT Equipment.category_id) > 2;"
 
 [[exercises]]
 title = "Exercise 9: Ranking by Aggregated Metric"

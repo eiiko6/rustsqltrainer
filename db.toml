@@ -60,7 +60,14 @@ INSERT INTO Client (name, email, age) VALUES
 ('Bob Martin', 'bob.martin@example.com', 42),
 ('Chloé Bernard', 'chloe.bernard@example.com', 35),
 ('David Leroy', 'david.leroy@example.com', 50),
-('Emma Fontaine', 'emma.fontaine@example.com', 22);
+('Emma Fontaine', 'emma.fontaine@example.com', 22),
+('François Moreau', 'francois.moreau@example.com', 38),
+('Giulia Rossi', 'giulia.rossi@example.it', 27),
+('Hans Müller', 'hans.mueller@example.de', 46),
+('Isabella García', 'isabella.garcia@example.es', 31),
+('Kenji Tanaka', 'kenji.tanaka@example.jp', 29),
+('Léa Dubois', 'lea.dubois@example.com', 54),
+('Marcus Johnson', 'marcus.johnson@example.com', 33);
 
 -- Addresses
 INSERT INTO Address (client_id, street, city, postal_code, country) VALUES
@@ -68,14 +75,22 @@ INSERT INTO Address (client_id, street, city, postal_code, country) VALUES
 (2, '5 Avenue Victor Hugo', 'Lyon', '69006', 'France'),
 (3, '3 Boulevard Haussmann', 'Marseille', '13008', 'France'),
 (4, '8 Rue des Lilas', 'Bordeaux', '33000', 'France'),
-(5, '1 Place Bellecour', 'Lyon', '69002', 'France');
+(5, '1 Place Bellecour', 'Lyon', '69002', 'France'),
+(6, '10 Rue Lafayette', 'Paris', '75009', 'France'),
+(7, 'Via Roma 45', 'Milan', '20121', 'Italy'),
+(8, 'Alexanderplatz 3', 'Berlin', '10178', 'Germany'),
+(9, 'Calle Mayor 20', 'Madrid', '28013', 'Spain'),
+(10, 'Shinjuku 5-10', 'Tokyo', '160-0022', 'Japan'),
+(11, '15 Rue des Fleurs', 'Nice', '06000', 'France'),
+(12, '123 Main Street', 'New York', '10001', 'USA');
 
 -- Categories
 INSERT INTO Category (name) VALUES 
 ('Camping'),
 ('Photography'),
 ('Audio'),
-('Sport');
+('Sport'),
+('Music Instruments');
 
 -- Equipment
 INSERT INTO Equipment (name, category_id, available, price_per_day) VALUES
@@ -84,7 +99,16 @@ INSERT INTO Equipment (name, category_id, available, price_per_day) VALUES
 ('Bluetooth Speaker', 3, 1, 15.0),
 ('Mountain Bike', 4, 1, 20.0),
 ('Sleeping Bag', 1, 1, 8.0),
-('Tripod', 2, 1, 5.0);
+('Tripod', 2, 1, 5.0),
+('Camping Stove', 1, 1, 10.0),
+('Kayak', 3, 1, 25.0),
+('Electric Guitar', 5, 1, 30.0),
+('Ski Set', 3, 1, 40.0),
+('Snowboard', 3, 1, 35.0),
+('GoPro Camera', 2, 1, 18.0),
+('Portable Projector', 3, 1, 22.0),
+('Camping Lantern', 1, 1, 7.5),
+('Road Bike', 4, 1, 22.0);
 
 -- Rentals
 INSERT INTO Rental (client_id, equipment_id, start_date, end_date, status) VALUES
@@ -93,13 +117,31 @@ INSERT INTO Rental (client_id, equipment_id, start_date, end_date, status) VALUE
 (1, 4, '2025-04-10', '2025-04-13', 'completed'),
 (3, 3, '2025-06-05', NULL, 'ongoing'),
 (4, 5, '2025-05-15', '2025-05-18', 'completed'),
+(4, 3, '2025-05-15', '2025-05-18', 'completed'),
+(4, 2, '2025-05-15', '2025-05-18', 'completed'),
 (1, 2, '2025-06-02', NULL, 'ongoing'),
-(5, 6, '2025-05-20', '2025-05-25', 'completed');
+(5, 6, '2025-05-20', '2025-05-25', 'completed'),
+(6, 8, '2025-06-10', NULL, 'ongoing'),
+(7, 9, '2025-07-01', '2025-07-05', 'completed'),
+(8, 10, '2025-01-15', '2025-01-20', 'completed'),
+(9, 11, '2025-02-12', '2025-02-16', 'completed'),
+(10, 12, '2025-08-01', NULL, 'ongoing'),
+(11, 13, '2025-05-25', '2025-05-28', 'completed'),
+(12, 14, '2025-06-20', NULL, 'ongoing'),
+(6, 15, '2025-07-05', '2025-07-08', 'completed'),
+(7, 16, '2025-07-10', '2025-07-14', 'completed');
 
 -- Payments
 INSERT INTO Payment (rental_id, amount, payment_date, method) VALUES
 (1, 50.0, '2025-05-01', 'credit_card'),
 (3, 60.0, '2025-04-10', 'paypal'),
 (5, 24.0, '2025-05-15', 'credit_card'),
-(7, 25.0, '2025-05-20', 'bank_transfer');
+(7, 25.0, '2025-05-20', 'bank_transfer'),
+(10, 100.0, '2025-06-10', 'paypal'),
+(11, 120.0, '2025-07-01', 'credit_card'),
+(12, 200.0, '2025-01-15', 'bank_transfer'),
+(13, 180.0, '2025-02-12', 'credit_card'),
+(15, 66.0, '2025-05-25', 'paypal'),
+(16, 88.0, '2025-06-20', 'credit_card'),
+(18, 54.0, '2025-07-05', 'bank_transfer'),
 """

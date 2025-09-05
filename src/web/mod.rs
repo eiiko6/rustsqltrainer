@@ -1,6 +1,4 @@
-use axum::Router;
 use std::net::SocketAddr;
-use tower_http::services::ServeDir;
 
 mod embed;
 use embed::app_router;

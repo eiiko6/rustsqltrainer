@@ -1,3 +1,27 @@
+<template>
+  <div v-if="exercise">
+    <img src="/schema.svg" />
+
+    <h2>{{ exercise.title }}</h2>
+    <p>{{ exercise.description }}</p>
+
+    <textarea v-model="query" rows="6" cols="60" placeholder="Write your SQL here"></textarea>
+    <br />
+    <button @click="submit">Submit</button>
+
+    <div v-if="result" class="result">
+      <p :style="{ color: result.correct ? 'green' : 'red' }">
+        {{ result.message }}
+      </p>
+      <button v-if="result.correct" @click="goNext">
+        Next Exercise
+      </button>
+    </div>
+  </div>
+
+  <p v-else>Loading...</p>
+</template>
+
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -55,28 +79,6 @@ function goNext() {
 }
 </script>
 
-<template>
-  <div v-if="exercise">
-    <h2>{{ exercise.title }}</h2>
-    <p>{{ exercise.description }}</p>
-
-    <textarea v-model="query" rows="6" cols="60" placeholder="Write your SQL here"></textarea>
-    <br />
-    <button @click="submit">Submit</button>
-
-    <div v-if="result" class="result">
-      <p :style="{ color: result.correct ? 'green' : 'red' }">
-        {{ result.message }}
-      </p>
-      <button v-if="result.correct" @click="goNext">
-        Next Exercise
-      </button>
-    </div>
-  </div>
-
-  <p v-else>Loading...</p>
-</template>
-
 <style>
 textarea {
   width: 100%;
@@ -128,5 +130,14 @@ button:hover {
 .result {
   margin-top: 1rem;
   font-weight: bold;
+}
+
+img {
+  border-radius: 15px;
+  display: block;
+  max-width: 100%;
+  margin: 1rem auto;
+  shape-rendering: crispEdges;
+  overflow: visible;
 }
 </style>
